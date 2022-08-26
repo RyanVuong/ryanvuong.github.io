@@ -84,7 +84,6 @@ h7{ font-size: 16px; }
     align-content: center;
     grid-template-columns: 1.5fr 1fr;
     grid-template-areas: 'greetingWrapper' 'greetingPicture';
-    justify-content: center
 }
 
 .greetingMessage{
