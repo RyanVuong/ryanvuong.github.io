@@ -1,30 +1,65 @@
-console.log('test')
+// ── Navbar scroll shadow ──────────────────────────────────────
+const navbar = document.getElementById('navbar');
 
-let theme = localStorage.getItem('theme')
+window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 50);
+}, { passive: true });
 
-if(theme == null){
-    setTheme('light')
-}
-else{
-    setTheme(theme)
-}
+// ── Mobile nav toggle ─────────────────────────────────────────
+const navToggle = document.getElementById('nav-toggle');
+const navLinks  = document.getElementById('nav-links');
 
-let themeDots = document.getElementsByClassName('theme-dot');
+navToggle.addEventListener('click', () => {
+    navLinks.classList.toggle('open');
+    const isOpen = navLinks.classList.contains('open');
+    navToggle.setAttribute('aria-expanded', isOpen);
+    navToggle.innerHTML = isOpen
+        ? '<i class="fas fa-times"></i>'
+        : '<i class="fas fa-bars"></i>';
+});
 
-for(var i = 0; themeDots.length > i; i++){
-    themeDots[i].addEventListener('click', function(){
-        let mode = this.dataset.mode
-        console.log('Option clicked', mode)
-        setTheme(mode)
-    })
-}
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        navToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    });
+});
 
-function setTheme(mode){
-    if(mode == 'light'){
-        document.getElementById('theme-style').href = 'styles.css'
+// Close mobile nav when clicking outside
+document.addEventListener('click', (e) => {
+    if (!navbar.contains(e.target) && navLinks.classList.contains('open')) {
+        navLinks.classList.remove('open');
+        navToggle.innerHTML = '<i class="fas fa-bars"></i>';
     }
-    if(mode == 'dark'){
-        document.getElementById('theme-style').href = 'dark.css'
-    }
-    localStorage.setItem('theme', mode)
-}
+});
+
+// ── Scroll reveal ─────────────────────────────────────────────
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ── Active nav link highlighting on scroll ────────────────────
+const sections = document.querySelectorAll('section[id]');
+const navAnchors = document.querySelectorAll('.nav-links a');
+
+const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const id = entry.target.id;
+            navAnchors.forEach(a => {
+                a.style.color = a.getAttribute('href') === `#${id}`
+                    ? 'var(--accent)'
+                    : '';
+            });
+        }
+    });
+}, { threshold: 0.4 });
+
+sections.forEach(s => sectionObserver.observe(s));
